@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7B8C31F0-2E70-46AD-9F3B-8FBB2F2F8629}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SiloModelingTaskClient</RootNamespace>
+    <AssemblyName>SiloModelingTaskClient</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Users\Administrator\.nuget\packages\newtonsoft.json\13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=18.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>C:\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=18.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>C:\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main_SiloModelingTaskClient.cs" />
+    <Compile Include="Form\Form_SiloModelingTaskClient.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\Form_SiloModelingTaskClient.Designer.cs">
+      <DependentUpon>Form_SiloModelingTaskClient.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Model\ModelingTask.cs" />
+    <Compile Include="Model\ApiModels.cs" />
+    <Compile Include="Model\RfaResourceRecord.cs" />
+    <Compile Include="Model\TaskResultRecord.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RfaResource\RfaFamilyCollector.cs" />
+    <Compile Include="RfaResource\RfaFamilyExportItem.cs" />
+    <Compile Include="RfaResource\RfaFamilyFileExporter.cs" />
+    <Compile Include="RfaResource\RfaFileData.cs" />
+    <Compile Include="RfaResource\RfaResourceApiClient.cs" />
+    <Compile Include="RfaResource\RfaResourceSaveExecutor.cs" />
+    <Compile Include="RfaResource\RfaResourceSaveExternalEventHandler.cs" />
+    <Compile Include="Utility\AssemblyResolver.cs" />
+    <Compile Include="Service\ModelingTaskExecutor.cs" />
+    <Compile Include="Service\ModelingTaskPoller.cs" />
+    <Compile Include="Service\RevitModelingExternalEventHandler.cs" />
+    <Compile Include="Utility\PluginConfig.cs" />
+    <Compile Include="Utility\SiloTaskRepository.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form\Form_SiloModelingTaskClient.resx">
+      <DependentUpon>Form_SiloModelingTaskClient.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SiloModelingTaskClient.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SiloModelingTaskClient.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

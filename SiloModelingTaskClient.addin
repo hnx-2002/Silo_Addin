@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Name>SiloModelingTaskClient</Name>
+    <Assembly>SiloModelingTaskClient.dll</Assembly>
+    <AddInId>7B8C31F0-2E70-46AD-9F3B-8FBB2F2F8629</AddInId>
+    <FullClassName>SiloModelingTaskClient.Main_SiloModelingTaskClient</FullClassName>
+    <Text>Silo建模任务客户端</Text>
+    <VendorId>TCDRI</VendorId>
+    <VendorDescription>Silo Modeling Task Client</VendorDescription>
+  </AddIn>
+</RevitAddIns>
