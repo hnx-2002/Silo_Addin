@@ -9,6 +9,8 @@ namespace SiloModelingTaskClient
 {
     public class SiloTaskRepository
     {
+        private const string ClientName = "SiloModelingTaskClient";
+
         private readonly string _apiBaseUrl;
         private readonly HttpClient _httpClient;
 
@@ -43,37 +45,108 @@ namespace SiloModelingTaskClient
             return response.Result;
         }
 
-        public void InsertModelingResultAndUpdateStatus(ModelingTask task, int modelingDoneStatus)
+        public DictSiloRecord GetDictSilo(Guid id)
         {
-            AddTaskResult(task);
+            var response = Get<TPResponse<DictSiloRecord>>("/Dict_silo/Get/" + id);
+            EnsureResponse(response, "Dict_silo/Get");
+            if (response.Result == null)
+            {
+                throw new InvalidOperationException("Dict_silo not found: " + id);
+            }
+
+            return response.Result;
+        }
+
+        public RfaResourceRecord GetRfaResourceByCode(string rfaCode)
+        {
+            var search = new
+            {
+                page = 1,
+                pageSize = 9999,
+                rfa_code = rfaCode,
+                symbol_name = (string)null,
+                rfa_path = (string)null,
+                file_name = (string)null,
+                create_account = (string)null,
+                update_account = (string)null
+            };
+
+            var response = Send<TPResponse<PagedResponse<RfaResourceRecord>>>(HttpMethod.Post, "/Rfa_resource/MultiPagedSearch", search);
+            EnsureResponse(response, "Rfa_resource/MultiPagedSearch");
+
+            List<RfaResourceRecord> matches = response.Result.Datas
+                .Where(x => x.RfaCode == rfaCode)
+                .ToList();
+
+            if (matches.Count == 0)
+            {
+                throw new InvalidOperationException("Rfa resource not found: " + rfaCode);
+            }
+
+            if (matches.Count > 1)
+            {
+                throw new InvalidOperationException("Rfa resource is not unique: " + rfaCode);
+            }
+
+            return matches[0];
+        }
+
+        public byte[] DownloadRfaResource(string rfaPath)
+        {
+            if (string.IsNullOrWhiteSpace(rfaPath))
+            {
+                throw new InvalidOperationException("Rfa path is empty.");
+            }
+
+            string url = _apiBaseUrl + "/Rfa_resource/Download" + rfaPath;
+            HttpResponseMessage response = _httpClient.GetAsync(url).GetAwaiter().GetResult();
+            byte[] bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+            if (!response.IsSuccessStatusCode)
+            {
+                string content = Encoding.UTF8.GetString(bytes);
+                throw new InvalidOperationException("GET " + url + " failed: " + response.StatusCode + " " + content);
+            }
+
+            return bytes;
+        }
+
+        public void InsertModelingResultsAndUpdateStatus(ModelingTask task, List<ModelingPlacementResult> placements, int modelingDoneStatus)
+        {
+            int sort = 1;
+            foreach (ModelingPlacementResult placement in placements)
+            {
+                AddTaskResult(task, placement, sort);
+                sort++;
+            }
+
             UpdateTaskStatus(task.Id, modelingDoneStatus);
         }
 
-        private void AddTaskResult(ModelingTask task)
+        private void AddTaskResult(ModelingTask task, ModelingPlacementResult placement, int sort)
         {
             long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             var record = new TaskResultRecord
             {
                 Id = Guid.NewGuid(),
                 TaskBaseId = task.Id,
-                Sort = 1,
-                LayoutTitle = "插件框架建模结果",
-                RfaResourceId = Guid.Empty,
-                LayoutType = "框架",
-                LocationX = task.TaskX,
-                LocationY = task.TaskY,
-                LocationZ = task.TaskZ,
+                Sort = sort,
+                LayoutTitle = placement.FamilyName,
+                RfaResourceId = placement.RfaResourceId,
+                LayoutType = placement.SymbolName,
+                LocationX = Convert.ToDecimal(placement.LocationXMeters),
+                LocationY = Convert.ToDecimal(placement.LocationYMeters),
+                LocationZ = Convert.ToDecimal(placement.LocationZMeters),
                 NormalX = 0,
                 NormalY = 0,
                 NormalZ = 1,
-                RotateAngle = task.RotationAngle,
-                CreateAccount = "SiloModelingTaskClient",
-                CreateUsername = "SiloModelingTaskClient",
+                RotateAngle = Convert.ToDecimal(placement.RotationAngleDegrees),
+                CreateAccount = ClientName,
+                CreateUsername = ClientName,
                 CreateTime = now,
-                UpdateAccount = "SiloModelingTaskClient",
-                UpdateUsername = "SiloModelingTaskClient",
+                UpdateAccount = ClientName,
+                UpdateUsername = ClientName,
                 UpdateTime = now,
-                Remark = "当前版本仅搭建监听和结果写入框架，未在Revit中实际建模。"
+                Remark = "Generated by Revit modeling plugin."
             };
 
             var response = Send<TPResponse<Res2Para>>(HttpMethod.Post, "/Task_result/Add", record);
@@ -87,8 +160,8 @@ namespace SiloModelingTaskClient
 
             ModelingTask task = getResponse.Result;
             task.Status = modelingDoneStatus;
-            task.UpdateAccount = "SiloModelingTaskClient";
-            task.UpdateUsername = "SiloModelingTaskClient";
+            task.UpdateAccount = ClientName;
+            task.UpdateUsername = ClientName;
             task.UpdateTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
             var updateResponse = Send<TPResponse<Res2Para>>(HttpMethod.Put, "/Task_base/Update", task);

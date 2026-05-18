@@ -1,3 +1,4 @@
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,13 @@ namespace SiloModelingTaskClient
                         continue;
                     }
 
-                    _executor.Execute(task, Log);
+                    UIDocument uidoc = app.ActiveUIDocument;
+                    if (uidoc == null || uidoc.Document == null)
+                    {
+                        throw new InvalidOperationException("No active Revit document.");
+                    }
+
+                    _executor.Execute(uidoc.Document, task, Log);
                 }
                 catch (Exception ex)
                 {

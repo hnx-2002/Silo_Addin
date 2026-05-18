@@ -39,7 +39,7 @@ namespace SiloModelingTaskClient
             {
                 _config = PluginConfig.Load();
                 _repository = new SiloTaskRepository(_config.ApiBaseUrl);
-                _handler.SetExecutor(new ModelingTaskExecutor(_repository, _config.ModelingDoneStatus));
+                _handler.SetExecutor(new ModelingTaskExecutor(_repository, _config.ModelingDoneStatus, _config.TemplateRootDir));
                 _handler.SetLog(AppendLog);
                 _poller = new ModelingTaskPoller(_repository, _config.NewTaskStatus, _config.PollIntervalMilliseconds, OnTaskDetected, AppendLog);
                 _poller.Start();
@@ -61,7 +61,7 @@ namespace SiloModelingTaskClient
             {
                 _config = PluginConfig.Load();
                 var apiClient = new RfaResourceApiClient(_config.ApiBaseUrl, _config.CoreApiBaseUrl);
-                _rfaResourceHandler.SetExecutor(new RfaResourceSaveExecutor(apiClient));
+                _rfaResourceHandler.SetExecutor(new RfaResourceSaveExecutor(apiClient, _config.TemplateTp3Dir));
                 _rfaResourceHandler.SetLog(AppendLog);
                 _rfaResourceHandler.Request();
                 _rfaResourceEvent.Raise();

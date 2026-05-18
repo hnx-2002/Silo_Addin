@@ -8,19 +8,25 @@ namespace SiloModelingTaskClient
     {
         private readonly RfaFamilyCollector _collector;
         private readonly RfaFamilyFileExporter _exporter;
+        private readonly RfaInstanceCoordinateExporter _coordinateExporter;
         private readonly RfaResourceApiClient _apiClient;
 
-        public RfaResourceSaveExecutor(RfaResourceApiClient apiClient)
+        public RfaResourceSaveExecutor(RfaResourceApiClient apiClient, string coordinateOutputDir)
         {
             _collector = new RfaFamilyCollector();
             _exporter = new RfaFamilyFileExporter();
+            _coordinateExporter = new RfaInstanceCoordinateExporter(coordinateOutputDir);
             _apiClient = apiClient;
         }
 
         public void Execute(Document doc, View activeView, Action<string> log)
         {
+            List<FamilyInstance> instances = _collector.CollectAllowedInstancesFromActive3DView(doc, activeView);
+            string coordinateJsonPath = _coordinateExporter.Export(instances);
+            log("族实例坐标JSON已写入：" + coordinateJsonPath);
+
             List<RfaFamilyExportItem> families = _collector.CollectFromActive3DView(doc, activeView);
-            log("当前三维视图族数量：" + families.Count);
+            log("当前三维视图目标族数量：" + families.Count);
 
             foreach (RfaFamilyExportItem family in families)
             {

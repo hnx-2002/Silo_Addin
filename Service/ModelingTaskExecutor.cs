@@ -1,3 +1,4 @@
+using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
 
@@ -7,20 +8,24 @@ namespace SiloModelingTaskClient
     {
         private readonly SiloTaskRepository _repository;
         private readonly int _modelingDoneStatus;
+        private readonly SiloModelingService _modelingService;
 
-        public ModelingTaskExecutor(SiloTaskRepository repository, int modelingDoneStatus)
+        public ModelingTaskExecutor(SiloTaskRepository repository, int modelingDoneStatus, string templateRootDir)
         {
             _repository = repository;
             _modelingDoneStatus = modelingDoneStatus;
+            _modelingService = new SiloModelingService(repository, templateRootDir);
         }
 
-        public void Execute(ModelingTask task, Action<string> log)
+        public void Execute(Document doc, ModelingTask task, Action<string> log)
         {
             List<TaskResultRecord> oldResults = _repository.GetTaskResults(task.Id);
-            log("已读取task_result，任务：" + task.Id + "，现有结果数量：" + oldResults.Count);
+            log("Task_result current count: " + oldResults.Count + ", task: " + task.Id);
 
-            _repository.InsertModelingResultAndUpdateStatus(task, _modelingDoneStatus);
-            log("已写入task_result，并将task_base.status更新为：" + _modelingDoneStatus + "，任务：" + task.Id);
+            List<ModelingPlacementResult> placements = _modelingService.Execute(doc, task, log);
+            _repository.InsertModelingResultsAndUpdateStatus(task, placements, _modelingDoneStatus);
+
+            log("Task_result written and task_base.status updated to " + _modelingDoneStatus + ", task: " + task.Id);
         }
     }
 }

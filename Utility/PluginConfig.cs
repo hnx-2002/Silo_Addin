@@ -9,6 +9,8 @@ namespace SiloModelingTaskClient
     {
         public string ApiBaseUrl { get; set; }
         public string CoreApiBaseUrl { get; set; }
+        public string TemplateRootDir { get; set; }
+        public string TemplateTp3Dir { get; set; }
         public int PollIntervalMilliseconds { get; set; }
         public int NewTaskStatus { get; set; }
         public int ModelingDoneStatus { get; set; }
@@ -27,6 +29,8 @@ namespace SiloModelingTaskClient
             {
                 ApiBaseUrl = Require(values, "ApiBaseUrl").TrimEnd('/'),
                 CoreApiBaseUrl = Require(values, "CoreApiBaseUrl").TrimEnd('/'),
+                TemplateRootDir = Require(values, "TemplateRootDir"),
+                TemplateTp3Dir = Require(values, "TemplateTp3Dir"),
                 PollIntervalMilliseconds = int.Parse(Require(values, "PollIntervalMilliseconds")),
                 NewTaskStatus = int.Parse(Require(values, "NewTaskStatus")),
                 ModelingDoneStatus = int.Parse(Require(values, "ModelingDoneStatus"))

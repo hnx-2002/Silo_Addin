@@ -58,14 +58,26 @@
       <DependentUpon>Form_SiloModelingTaskClient.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\ModelingTask.cs" />
+    <Compile Include="Model\ModelingPlacementResult.cs" />
+    <Compile Include="Model\PlacementTemplateRecord.cs" />
     <Compile Include="Model\ApiModels.cs" />
+    <Compile Include="Model\DictSiloRecord.cs" />
     <Compile Include="Model\RfaResourceRecord.cs" />
     <Compile Include="Model\TaskResultRecord.cs" />
+    <Compile Include="Modeling\PlacementTemplateLoader.cs" />
+    <Compile Include="Modeling\PlacementTransformCalculator.cs" />
+    <Compile Include="Modeling\RevitFamilyPlacementService.cs" />
+    <Compile Include="Modeling\RfaFileCache.cs" />
+    <Compile Include="Modeling\RfaResourceResolver.cs" />
+    <Compile Include="Modeling\SiloModelingService.cs" />
+    <Compile Include="Modeling\SiloTypeResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RfaResource\RfaFamilyCollector.cs" />
     <Compile Include="RfaResource\RfaFamilyExportItem.cs" />
     <Compile Include="RfaResource\RfaFamilyFileExporter.cs" />
     <Compile Include="RfaResource\RfaFileData.cs" />
+    <Compile Include="RfaResource\RfaInstanceCoordinateExporter.cs" />
+    <Compile Include="RfaResource\RfaInstanceCoordinateRecord.cs" />
     <Compile Include="RfaResource\RfaResourceApiClient.cs" />
     <Compile Include="RfaResource\RfaResourceSaveExecutor.cs" />
     <Compile Include="RfaResource\RfaResourceSaveExternalEventHandler.cs" />
@@ -73,6 +85,7 @@
     <Compile Include="Service\ModelingTaskExecutor.cs" />
     <Compile Include="Service\ModelingTaskPoller.cs" />
     <Compile Include="Service\RevitModelingExternalEventHandler.cs" />
+    <Compile Include="Utility\ModelingUnitConverter.cs" />
     <Compile Include="Utility\PluginConfig.cs" />
     <Compile Include="Utility\SiloTaskRepository.cs" />
   </ItemGroup>
