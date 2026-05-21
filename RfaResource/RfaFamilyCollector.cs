@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace SiloModelingTaskClient
 {
+    /// <summary>
+    /// 当前三维视图族实例采集器
+    /// </summary>
     public class RfaFamilyCollector
     {
         private static readonly HashSet<string> AllowedFamilyNames = new HashSet<string>
@@ -13,6 +16,12 @@ namespace SiloModelingTaskClient
             "库底充气斜槽示意"
         };
 
+        /// <summary>
+        /// 从当前三维视图采集允许保存的唯一族资源项
+        /// </summary>
+        /// <param name="doc">Revit文档</param>
+        /// <param name="activeView">当前视图</param>
+        /// <returns>待导出的族资源项</returns>
         public List<RfaFamilyExportItem> CollectFromActive3DView(Document doc, View activeView)
         {
             if (!(activeView is View3D))
@@ -36,6 +45,12 @@ namespace SiloModelingTaskClient
                 .ToList();
         }
 
+        /// <summary>
+        /// 从当前三维视图采集允许保存的所有族实例
+        /// </summary>
+        /// <param name="doc">Revit文档</param>
+        /// <param name="activeView">当前视图</param>
+        /// <returns>允许保存的族实例</returns>
         public List<FamilyInstance> CollectAllowedInstancesFromActive3DView(Document doc, View activeView)
         {
             if (!(activeView is View3D))

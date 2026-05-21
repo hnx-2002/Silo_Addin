@@ -35,28 +35,28 @@ namespace SiloModelingTaskClient
                 {
                     if (_executor == null)
                     {
-                        Log("Executor is not initialized.");
+                        Log("建模执行器未初始化。");
                         continue;
                     }
 
                     UIDocument uidoc = app.ActiveUIDocument;
                     if (uidoc == null || uidoc.Document == null)
                     {
-                        throw new InvalidOperationException("No active Revit document.");
+                        throw new InvalidOperationException("当前没有打开的Revit文档。");
                     }
 
                     _executor.Execute(uidoc.Document, task, Log);
                 }
                 catch (Exception ex)
                 {
-                    Log("Task execution failed: " + task.Id + ", " + ex.Message);
+                    Log("任务执行失败：" + task.Id + "，" + ex.Message);
                 }
             }
         }
 
         public string GetName()
         {
-            return "Silo Modeling Task Listener";
+            return "筒仓建模任务执行器";
         }
 
         private void Log(string message)

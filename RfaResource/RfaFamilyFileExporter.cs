@@ -4,8 +4,17 @@ using System.IO;
 
 namespace SiloModelingTaskClient
 {
+    /// <summary>
+    /// Revit族文件导出器
+    /// </summary>
     public class RfaFamilyFileExporter
     {
+        /// <summary>
+        /// 将Revit族实例对应的族导出为族文件数据
+        /// </summary>
+        /// <param name="doc">Revit文档</param>
+        /// <param name="item">待导出的族资源项</param>
+        /// <returns>导出的族文件数据</returns>
         public RfaFileData Export(Document doc, RfaFamilyExportItem item)
         {
             if (item == null || item.Instance == null)

@@ -83,7 +83,6 @@
     <Compile Include="RfaResource\RfaResourceSaveExternalEventHandler.cs" />
     <Compile Include="Utility\AssemblyResolver.cs" />
     <Compile Include="Service\ModelingTaskExecutor.cs" />
-    <Compile Include="Service\ModelingTaskPoller.cs" />
     <Compile Include="Service\RevitModelingExternalEventHandler.cs" />
     <Compile Include="Utility\ModelingUnitConverter.cs" />
     <Compile Include="Utility\PluginConfig.cs" />

@@ -5,16 +5,45 @@ using System.Reflection;
 
 namespace SiloModelingTaskClient
 {
+    /// <summary>
+    /// 插件配置
+    /// </summary>
     public class PluginConfig
     {
+        /// <summary>
+        /// 业务接口基础地址
+        /// </summary>
         public string ApiBaseUrl { get; set; }
+
+        /// <summary>
+        /// 核心接口基础地址
+        /// </summary>
         public string CoreApiBaseUrl { get; set; }
+
+        /// <summary>
+        /// 模板根目录
+        /// </summary>
         public string TemplateRootDir { get; set; }
+
+        /// <summary>
+        /// TP3模板目录
+        /// </summary>
         public string TemplateTp3Dir { get; set; }
-        public int PollIntervalMilliseconds { get; set; }
+
+        /// <summary>
+        /// 新建任务状态码
+        /// </summary>
         public int NewTaskStatus { get; set; }
+
+        /// <summary>
+        /// 建模完成状态码
+        /// </summary>
         public int ModelingDoneStatus { get; set; }
 
+        /// <summary>
+        /// 从插件配置文件加载配置
+        /// </summary>
+        /// <returns>插件配置</returns>
         public static PluginConfig Load()
         {
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -31,12 +60,16 @@ namespace SiloModelingTaskClient
                 CoreApiBaseUrl = Require(values, "CoreApiBaseUrl").TrimEnd('/'),
                 TemplateRootDir = Require(values, "TemplateRootDir"),
                 TemplateTp3Dir = Require(values, "TemplateTp3Dir"),
-                PollIntervalMilliseconds = int.Parse(Require(values, "PollIntervalMilliseconds")),
                 NewTaskStatus = int.Parse(Require(values, "NewTaskStatus")),
                 ModelingDoneStatus = int.Parse(Require(values, "ModelingDoneStatus"))
             };
         }
 
+        /// <summary>
+        /// 读取配置文件中的键值对
+        /// </summary>
+        /// <param name="path">配置文件路径</param>
+        /// <returns>配置键值对</returns>
         private static Dictionary<string, string> ReadKeyValues(string path)
         {
             var res = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -62,6 +95,12 @@ namespace SiloModelingTaskClient
             return res;
         }
 
+        /// <summary>
+        /// 读取必填配置项
+        /// </summary>
+        /// <param name="values">配置键值对</param>
+        /// <param name="key">配置项名称</param>
+        /// <returns>配置项值</returns>
         private static string Require(Dictionary<string, string> values, string key)
         {
             if (!values.ContainsKey(key) || string.IsNullOrWhiteSpace(values[key]))

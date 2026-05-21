@@ -6,15 +6,27 @@ using System.IO;
 
 namespace SiloModelingTaskClient
 {
+    /// <summary>
+    /// 族实例坐标JSON导出器
+    /// </summary>
     public class RfaInstanceCoordinateExporter
     {
         private readonly string _outputDir;
 
+        /// <summary>
+        /// 初始化族实例坐标JSON导出器
+        /// </summary>
+        /// <param name="outputDir">坐标JSON输出目录</param>
         public RfaInstanceCoordinateExporter(string outputDir)
         {
             _outputDir = outputDir;
         }
 
+        /// <summary>
+        /// 将族实例坐标导出为JSON文件
+        /// </summary>
+        /// <param name="instances">族实例集合</param>
+        /// <returns>坐标JSON文件路径</returns>
         public string Export(List<FamilyInstance> instances)
         {
             var records = new List<RfaInstanceCoordinateRecord>();

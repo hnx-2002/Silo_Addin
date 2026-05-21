@@ -16,8 +16,8 @@ namespace SiloModelingTaskClient
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.button_Start = new System.Windows.Forms.Button();
-            this.button_Stop = new System.Windows.Forms.Button();
+            this.button_GetNewTasks = new System.Windows.Forms.Button();
+            this.button_ExecuteModeling = new System.Windows.Forms.Button();
             this.button_SaveRfaResource = new System.Windows.Forms.Button();
             this.textBox_Log = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
@@ -27,34 +27,33 @@ namespace SiloModelingTaskClient
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(113, 12);
+            this.label1.Size = new System.Drawing.Size(101, 12);
             this.label1.TabIndex = 0;
-            this.label1.Text = "建模任务监听状态：";
+            this.label1.Text = "建模任务操作：";
             // 
-            // button_Start
+            // button_GetNewTasks
             // 
-            this.button_Start.Location = new System.Drawing.Point(14, 45);
-            this.button_Start.Name = "button_Start";
-            this.button_Start.Size = new System.Drawing.Size(82, 34);
-            this.button_Start.TabIndex = 1;
-            this.button_Start.Text = "开始";
-            this.button_Start.UseVisualStyleBackColor = true;
-            this.button_Start.Click += new System.EventHandler(this.button_Start_Click);
+            this.button_GetNewTasks.Location = new System.Drawing.Point(14, 45);
+            this.button_GetNewTasks.Name = "button_GetNewTasks";
+            this.button_GetNewTasks.Size = new System.Drawing.Size(92, 34);
+            this.button_GetNewTasks.TabIndex = 1;
+            this.button_GetNewTasks.Text = "获取新任务";
+            this.button_GetNewTasks.UseVisualStyleBackColor = true;
+            this.button_GetNewTasks.Click += new System.EventHandler(this.button_GetNewTasks_Click);
             // 
-            // button_Stop
+            // button_ExecuteModeling
             // 
-            this.button_Stop.Enabled = false;
-            this.button_Stop.Location = new System.Drawing.Point(102, 45);
-            this.button_Stop.Name = "button_Stop";
-            this.button_Stop.Size = new System.Drawing.Size(82, 34);
-            this.button_Stop.TabIndex = 2;
-            this.button_Stop.Text = "停止";
-            this.button_Stop.UseVisualStyleBackColor = true;
-            this.button_Stop.Click += new System.EventHandler(this.button_Stop_Click);
+            this.button_ExecuteModeling.Location = new System.Drawing.Point(112, 45);
+            this.button_ExecuteModeling.Name = "button_ExecuteModeling";
+            this.button_ExecuteModeling.Size = new System.Drawing.Size(92, 34);
+            this.button_ExecuteModeling.TabIndex = 2;
+            this.button_ExecuteModeling.Text = "执行建模";
+            this.button_ExecuteModeling.UseVisualStyleBackColor = true;
+            this.button_ExecuteModeling.Click += new System.EventHandler(this.button_ExecuteModeling_Click);
             // 
             // button_SaveRfaResource
             // 
-            this.button_SaveRfaResource.Location = new System.Drawing.Point(190, 45);
+            this.button_SaveRfaResource.Location = new System.Drawing.Point(210, 45);
             this.button_SaveRfaResource.Name = "button_SaveRfaResource";
             this.button_SaveRfaResource.Size = new System.Drawing.Size(110, 34);
             this.button_SaveRfaResource.TabIndex = 4;
@@ -82,20 +81,19 @@ namespace SiloModelingTaskClient
             this.ClientSize = new System.Drawing.Size(692, 613);
             this.Controls.Add(this.textBox_Log);
             this.Controls.Add(this.button_SaveRfaResource);
-            this.Controls.Add(this.button_Stop);
-            this.Controls.Add(this.button_Start);
+            this.Controls.Add(this.button_ExecuteModeling);
+            this.Controls.Add(this.button_GetNewTasks);
             this.Controls.Add(this.label1);
             this.Name = "Form_SiloModelingTaskClient";
             this.Text = "Form_SiloModelingTaskClient";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_SiloModelingTaskClient_FormClosing);
             this.Load += new System.EventHandler(this.Form_SiloModelingTaskClient_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button_Start;
-        private System.Windows.Forms.Button button_Stop;
+        private System.Windows.Forms.Button button_GetNewTasks;
+        private System.Windows.Forms.Button button_ExecuteModeling;
         private System.Windows.Forms.Button button_SaveRfaResource;
         private System.Windows.Forms.TextBox textBox_Log;
     }

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace SiloModelingTaskClient
 {
+    /// <summary>
+    /// 族资源保存执行器
+    /// </summary>
     public class RfaResourceSaveExecutor
     {
         private readonly RfaFamilyCollector _collector;
@@ -11,6 +14,11 @@ namespace SiloModelingTaskClient
         private readonly RfaInstanceCoordinateExporter _coordinateExporter;
         private readonly RfaResourceApiClient _apiClient;
 
+        /// <summary>
+        /// 初始化族资源保存执行器
+        /// </summary>
+        /// <param name="apiClient">族资源后端接口客户端</param>
+        /// <param name="coordinateOutputDir">坐标JSON输出目录</param>
         public RfaResourceSaveExecutor(RfaResourceApiClient apiClient, string coordinateOutputDir)
         {
             _collector = new RfaFamilyCollector();
@@ -19,11 +27,17 @@ namespace SiloModelingTaskClient
             _apiClient = apiClient;
         }
 
+        /// <summary>
+        /// 保存当前三维视图中的目标族资源并导出族实例坐标JSON
+        /// </summary>
+        /// <param name="doc">Revit文档</param>
+        /// <param name="activeView">当前视图</param>
+        /// <param name="log">日志输出方法</param>
         public void Execute(Document doc, View activeView, Action<string> log)
         {
             List<FamilyInstance> instances = _collector.CollectAllowedInstancesFromActive3DView(doc, activeView);
             string coordinateJsonPath = _coordinateExporter.Export(instances);
-            log("族实例坐标JSON已写入：" + coordinateJsonPath);
+            log("族实例坐标文件已写入：" + coordinateJsonPath);
 
             List<RfaFamilyExportItem> families = _collector.CollectFromActive3DView(doc, activeView);
             log("当前三维视图目标族数量：" + families.Count);
@@ -54,7 +68,7 @@ namespace SiloModelingTaskClient
                 };
 
                 _apiClient.AddRfaResource(record);
-                log("族资源已保存：" + family.FamilyName + "，OSS：" + upload.FilePath);
+                log("族资源已保存：" + family.FamilyName + "，文件地址：" + upload.FilePath);
             }
         }
     }

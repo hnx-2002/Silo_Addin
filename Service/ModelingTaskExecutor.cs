@@ -20,12 +20,12 @@ namespace SiloModelingTaskClient
         public void Execute(Document doc, ModelingTask task, Action<string> log)
         {
             List<TaskResultRecord> oldResults = _repository.GetTaskResults(task.Id);
-            log("Task_result current count: " + oldResults.Count + ", task: " + task.Id);
+            log("已读取任务结果，当前数量：" + oldResults.Count + "，任务：" + task.Id);
 
             List<ModelingPlacementResult> placements = _modelingService.Execute(doc, task, log);
             _repository.InsertModelingResultsAndUpdateStatus(task, placements, _modelingDoneStatus);
 
-            log("Task_result written and task_base.status updated to " + _modelingDoneStatus + ", task: " + task.Id);
+            log("任务结果已写入，任务状态已更新为：" + _modelingDoneStatus + "，任务：" + task.Id);
         }
     }
 }

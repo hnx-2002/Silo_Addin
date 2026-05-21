@@ -5,10 +5,20 @@ using System.Linq;
 
 namespace SiloModelingTaskClient
 {
+    /// <summary>
+    /// 族实例放置坐标转换计算器
+    /// </summary>
     public class PlacementTransformCalculator
     {
         private const string BaseFamilyName = "结构库底板示意";
 
+        /// <summary>
+        /// 计算核心模块，根据模板坐标、任务基点和旋转角度计算最终放置结果
+        /// </summary>
+        /// <param name="templateRecords">族实例坐标模板记录</param>
+        /// <param name="task">建模任务</param>
+        /// <param name="rfaResources">族资源字典</param>
+        /// <returns>族实例放置结果</returns>
         public List<ModelingPlacementResult> Calculate(
             List<PlacementTemplateRecord> templateRecords,
             ModelingTask task,
@@ -27,7 +37,7 @@ namespace SiloModelingTaskClient
 
             if (!task.RotationAngle.HasValue)
             {
-                throw new InvalidOperationException("Modeling task is missing rotation_angle.");
+                throw new InvalidOperationException("建模任务缺少旋转角度。");
             }
 
             double angleDegrees = Decimal.ToDouble(task.RotationAngle.Value);
