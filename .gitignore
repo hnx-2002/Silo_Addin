@@ -382,20 +382,14 @@ dist-ssr
 /Backend_cs/.config
 /Backend_cs/wwwroot/*
 /Backend_cs/appsettings.Production.json
-/Backend_cs/Flow2Layout.xml
-/Client/Flow2LayoutAdminClient/packages/
-/Client/TCDRIDesignRevitAgent/packages/
-/Client/TDRevitEye/packages/
-/Client/TDRevitHand/packages/
+/Backend_cs/PTools_PSilo.xml
 /Frontend/package-lock.json
 /Frontend/pnpm-lock.yaml
 /FrontendTS/package-lock.json
 /FrontendTS/pnpm-lock.yaml
-/FrontendTS/node_modules/
 .github/
 .vs/
 
 vue-global-types.d.ts
 
 /TPDeploy/*
-TCDRI-PROJECT-2019.4.2.rte

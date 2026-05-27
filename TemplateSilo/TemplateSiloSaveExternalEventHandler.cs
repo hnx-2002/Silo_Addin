@@ -5,19 +5,19 @@ using System;
 namespace SiloModelingTaskClient
 {
     /// <summary>
-    /// 族资源保存ExternalEvent处理器
+    /// 库型模板保存ExternalEvent处理器
     /// </summary>
-    public class RfaResourceSaveExternalEventHandler : IExternalEventHandler
+    public class TemplateSiloSaveExternalEventHandler : IExternalEventHandler
     {
-        private RfaResourceSaveExecutor _executor;
+        private TemplateSiloSaveExecutor _executor;
         private Action<string> _log;
         private bool _requested;
 
         /// <summary>
-        /// 设置族资源保存执行器
+        /// 设置库型模板保存执行器
         /// </summary>
-        /// <param name="executor">族资源保存执行器</param>
-        public void SetExecutor(RfaResourceSaveExecutor executor)
+        /// <param name="executor">库型模板保存执行器</param>
+        public void SetExecutor(TemplateSiloSaveExecutor executor)
         {
             _executor = executor;
         }
@@ -32,7 +32,7 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 标记一次族资源保存请求
+        /// 标记一次库型模板保存请求
         /// </summary>
         public void Request()
         {
@@ -40,7 +40,7 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 在Revit API上下文中执行族资源保存请求
+        /// 在Revit API上下文中执行库型模板保存请求
         /// </summary>
         /// <param name="app">Revit应用程序对象</param>
         public void Execute(UIApplication app)
@@ -55,7 +55,7 @@ namespace SiloModelingTaskClient
             {
                 if (_executor == null)
                 {
-                    Log("族资源保存执行器未初始化。");
+                    Log("库型模板保存执行器未初始化。");
                     return;
                 }
 
@@ -66,7 +66,7 @@ namespace SiloModelingTaskClient
             }
             catch (Exception ex)
             {
-                Log("保存族资源失败：" + ex.Message);
+                Log("保存库型模板失败：" + ex.Message);
             }
         }
 
@@ -76,7 +76,7 @@ namespace SiloModelingTaskClient
         /// <returns>ExternalEvent处理器名称</returns>
         public string GetName()
         {
-            return "筒仓族资源保存器";
+            return "筒仓库型模板保存器";
         }
 
         /// <summary>

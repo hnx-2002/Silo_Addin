@@ -19,21 +19,21 @@ namespace SiloModelingTaskClient
             {
                 if (uidoc == null || uidoc.Document == null)
                 {
-                    Autodesk.Revit.UI.TaskDialog.Show("Notice", "Please open a Revit document before using this plugin.");
+                    Autodesk.Revit.UI.TaskDialog.Show("Notice", "请打开Revit文档");
                     return Result.Cancelled;
                 }
             }
             catch (Exception)
             {
-                Autodesk.Revit.UI.TaskDialog.Show("Notice", "Please open a Revit document before using this plugin.");
+                Autodesk.Revit.UI.TaskDialog.Show("Notice", "请打开Revit文档");
                 return Result.Cancelled;
             }
 
             var modelingHandler = new RevitModelingExternalEventHandler();
             var modelingEvent = ExternalEvent.Create(modelingHandler);
-            var rfaResourceHandler = new RfaResourceSaveExternalEventHandler();
-            var rfaResourceEvent = ExternalEvent.Create(rfaResourceHandler);
-            var frm = new Form_SiloModelingTaskClient(modelingHandler, modelingEvent, rfaResourceHandler, rfaResourceEvent);
+            var templateSiloHandler = new TemplateSiloSaveExternalEventHandler();
+            var templateSiloEvent = ExternalEvent.Create(templateSiloHandler);
+            var frm = new Form_SiloModelingTaskClient(modelingHandler, modelingEvent, templateSiloHandler, templateSiloEvent);
             frm.Show();
 
             return Result.Succeeded;

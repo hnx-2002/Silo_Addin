@@ -1,65 +1,53 @@
+using Newtonsoft.Json;
 using System;
 
 namespace SiloModelingTaskClient
 {
     /// <summary>
-    /// 建模族实例放置结果
+    /// 后端模板族放置计算结果
     /// </summary>
-    public class ModelingPlacementResult
+    public class TemplatePlacementResult
     {
         /// <summary>
         /// 库型模板Id
         /// </summary>
+        [JsonProperty("template_silo_id")]
         public Guid TemplateSiloId { get; set; }
 
         /// <summary>
         /// 族类型名
         /// </summary>
+        [JsonProperty("symbol_name")]
         public string SymbolName { get; set; }
 
         /// <summary>
         /// 族文件地址
         /// </summary>
+        [JsonProperty("rfa_path")]
         public string RfaPath { get; set; }
 
         /// <summary>
         /// Revit内部X坐标
         /// </summary>
-        public double X { get; set; }
+        [JsonProperty("location_x")]
+        public double LocationX { get; set; }
 
         /// <summary>
         /// Revit内部Y坐标
         /// </summary>
-        public double Y { get; set; }
+        [JsonProperty("location_y")]
+        public double LocationY { get; set; }
 
         /// <summary>
         /// Revit内部Z坐标
         /// </summary>
-        public double Z { get; set; }
+        [JsonProperty("location_z")]
+        public double LocationZ { get; set; }
 
         /// <summary>
         /// Revit内部旋转角度
         /// </summary>
-        public double RotationAngle { get; set; }
-
-        /// <summary>
-        /// 米制X坐标
-        /// </summary>
-        public double LocationXMeters { get; set; }
-
-        /// <summary>
-        /// 米制Y坐标
-        /// </summary>
-        public double LocationYMeters { get; set; }
-
-        /// <summary>
-        /// 米制Z坐标
-        /// </summary>
-        public double LocationZMeters { get; set; }
-
-        /// <summary>
-        /// 旋转角度，单位为度
-        /// </summary>
-        public double RotationAngleDegrees { get; set; }
+        [JsonProperty("rotate_angle")]
+        public double RotateAngle { get; set; }
     }
 }

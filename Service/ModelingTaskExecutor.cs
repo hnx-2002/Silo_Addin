@@ -10,11 +10,11 @@ namespace SiloModelingTaskClient
         private readonly int _modelingDoneStatus;
         private readonly SiloModelingService _modelingService;
 
-        public ModelingTaskExecutor(SiloTaskRepository repository, int modelingDoneStatus, string templateRootDir)
+        public ModelingTaskExecutor(SiloTaskRepository repository, int modelingDoneStatus)
         {
             _repository = repository;
             _modelingDoneStatus = modelingDoneStatus;
-            _modelingService = new SiloModelingService(repository, templateRootDir);
+            _modelingService = new SiloModelingService(repository);
         }
 
         public void Execute(Document doc, ModelingTask task, Action<string> log)

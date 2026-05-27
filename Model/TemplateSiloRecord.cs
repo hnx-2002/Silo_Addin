@@ -4,51 +4,51 @@ using System;
 namespace SiloModelingTaskClient
 {
     /// <summary>
-    /// 族资源表记录
+    /// 库型模板表记录
     /// </summary>
-    public class RfaResourceRecord
+    public class TemplateSiloRecord
     {
         /// <summary>
-        /// 族资源Id
+        /// 库型模板Id
         /// </summary>
         [JsonProperty("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 族编码
+        /// 库型名称
         /// </summary>
-        [JsonProperty("rfa_code")]
-        public string RfaCode { get; set; }
+        [JsonProperty("silo_name")]
+        public string SiloName { get; set; }
 
         /// <summary>
-        /// 族类型名称
+        /// 族类型名
         /// </summary>
         [JsonProperty("symbol_name")]
         public string SymbolName { get; set; }
 
         /// <summary>
-        /// 族文件OSS路径
+        /// 族文件地址
         /// </summary>
         [JsonProperty("rfa_path")]
         public string RfaPath { get; set; }
 
         /// <summary>
-        /// 文件名称
+        /// 模板X坐标
         /// </summary>
-        [JsonProperty("file_name")]
-        public string FileName { get; set; }
+        [JsonProperty("template_x")]
+        public decimal TemplateX { get; set; }
 
         /// <summary>
-        /// 文件大小
+        /// 模板Y坐标
         /// </summary>
-        [JsonProperty("file_size")]
-        public int FileSize { get; set; }
+        [JsonProperty("template_y")]
+        public decimal TemplateY { get; set; }
 
         /// <summary>
-        /// 说明
+        /// 模板Z坐标
         /// </summary>
-        [JsonProperty("note")]
-        public string Note { get; set; }
+        [JsonProperty("template_z")]
+        public decimal TemplateZ { get; set; }
 
         /// <summary>
         /// 创建账号

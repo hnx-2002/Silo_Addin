@@ -8,7 +8,7 @@ using System.Text;
 namespace SiloModelingTaskClient
 {
     /// <summary>
-    /// 筒仓建模任务后端接口仓储
+    /// 筒仓建模任务后端仓储
     /// </summary>
     public class SiloTaskRepository
     {
@@ -18,7 +18,7 @@ namespace SiloModelingTaskClient
         private readonly HttpClient _httpClient;
 
         /// <summary>
-        /// 初始化筒仓建模任务后端接口仓储
+        /// 初始化筒仓建模任务后端仓储
         /// </summary>
         /// <param name="apiBaseUrl">业务接口基础地址</param>
         public SiloTaskRepository(string apiBaseUrl)
@@ -28,10 +28,10 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 获取新建状态的建模任务
+        /// 获取后端新建状态的建模任务
         /// </summary>
-        /// <param name="newTaskStatus">新建任务状态码</param>
-        /// <returns>新建建模任务列表</returns>
+        /// <param name="newTaskStatus">新建任务状态值</param>
+        /// <returns>新建建模任务集合</returns>
         public List<ModelingTask> GetNewTasks(int newTaskStatus)
         {
             var search = new
@@ -51,10 +51,10 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 根据建模任务Id获取已有任务结果
+        /// 获取指定建模任务的结果记录
         /// </summary>
-        /// <param name="taskBaseId">建模任务Id</param>
-        /// <returns>任务结果列表</returns>
+        /// <param name="taskBaseId">建模任务主键</param>
+        /// <returns>任务结果记录集合</returns>
         public List<TaskResultRecord> GetTaskResults(Guid taskBaseId)
         {
             var response = Get<TPResponse<List<TaskResultRecord>>>("/Task_result/Search_Task_base_id/" + taskBaseId);
@@ -63,9 +63,9 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 根据库型字典Id获取库型字典记录
+        /// 获取指定库型字典记录
         /// </summary>
-        /// <param name="id">库型字典Id</param>
+        /// <param name="id">库型字典主键</param>
         /// <returns>库型字典记录</returns>
         public DictSiloRecord GetDictSilo(Guid id)
         {
@@ -80,57 +80,44 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 根据族编码获取族资源记录
+        /// 调用后端计算接口获取模板族放置结果
         /// </summary>
-        /// <param name="rfaCode">族编码</param>
-        /// <returns>族资源记录</returns>
-        public RfaResourceRecord GetRfaResourceByCode(string rfaCode)
+        /// <param name="taskId">建模任务主键</param>
+        /// <returns>建模放置结果集合</returns>
+        public List<ModelingPlacementResult> CalculateTemplatePlacements(Guid taskId)
         {
-            var search = new
+            var response = Get<TPResponse<List<TemplatePlacementResult>>>("/SiloModelingCalculation/Calculate/" + taskId);
+            EnsureResponse(response, "SiloModelingCalculation/Calculate");
+
+            return response.Result.Select(x => new ModelingPlacementResult
             {
-                page = 1,
-                pageSize = 9999,
-                rfa_code = rfaCode,
-                symbol_name = (string)null,
-                rfa_path = (string)null,
-                file_name = (string)null,
-                create_account = (string)null,
-                update_account = (string)null
-            };
-
-            var response = Send<TPResponse<PagedResponse<RfaResourceRecord>>>(HttpMethod.Post, "/Rfa_resource/MultiPagedSearch", search);
-            EnsureResponse(response, "Rfa_resource/MultiPagedSearch");
-
-            List<RfaResourceRecord> matches = response.Result.Datas
-                .Where(x => x.RfaCode == rfaCode)
-                .ToList();
-
-            if (matches.Count == 0)
-            {
-                throw new InvalidOperationException("未找到族资源：" + rfaCode);
-            }
-
-            if (matches.Count > 1)
-            {
-                throw new InvalidOperationException("族资源不唯一：" + rfaCode);
-            }
-
-            return matches[0];
+                TemplateSiloId = x.TemplateSiloId,
+                SymbolName = x.SymbolName,
+                RfaPath = x.RfaPath,
+                X = x.LocationX,
+                Y = x.LocationY,
+                Z = x.LocationZ,
+                RotationAngle = x.RotateAngle,
+                LocationXMeters = ModelingUnitConverter.FeetToMeters(x.LocationX),
+                LocationYMeters = ModelingUnitConverter.FeetToMeters(x.LocationY),
+                LocationZMeters = ModelingUnitConverter.FeetToMeters(x.LocationZ),
+                RotationAngleDegrees = x.RotateAngle * 180.0 / Math.PI
+            }).ToList();
         }
 
         /// <summary>
-        /// 下载族资源文件
+        /// 下载库型模板族文件
         /// </summary>
-        /// <param name="rfaPath">族资源OSS路径</param>
-        /// <returns>族文件二进制内容</returns>
-        public byte[] DownloadRfaResource(string rfaPath)
+        /// <param name="rfaPath">族文件后端地址</param>
+        /// <returns>族文件字节数据</returns>
+        public byte[] DownloadTemplateSiloRfa(string rfaPath)
         {
             if (string.IsNullOrWhiteSpace(rfaPath))
             {
                 throw new InvalidOperationException("族文件路径为空。");
             }
 
-            string url = _apiBaseUrl + "/Rfa_resource/Download" + rfaPath;
+            string url = _apiBaseUrl + "/Template_silo/Download" + rfaPath;
             HttpResponseMessage response = _httpClient.GetAsync(url).GetAwaiter().GetResult();
             byte[] bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
@@ -146,8 +133,8 @@ namespace SiloModelingTaskClient
         /// 写入建模结果并更新任务状态
         /// </summary>
         /// <param name="task">建模任务</param>
-        /// <param name="placements">族实例放置结果</param>
-        /// <param name="modelingDoneStatus">建模完成状态码</param>
+        /// <param name="placements">建模放置结果集合</param>
+        /// <param name="modelingDoneStatus">建模完成状态值</param>
         public void InsertModelingResultsAndUpdateStatus(ModelingTask task, List<ModelingPlacementResult> placements, int modelingDoneStatus)
         {
             int sort = 1;
@@ -161,11 +148,11 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 新增单条建模任务结果
+        /// 写入单条任务结果记录
         /// </summary>
         /// <param name="task">建模任务</param>
-        /// <param name="placement">族实例放置结果</param>
-        /// <param name="sort">排序值</param>
+        /// <param name="placement">建模放置结果</param>
+        /// <param name="sort">结果排序号</param>
         private void AddTaskResult(ModelingTask task, ModelingPlacementResult placement, int sort)
         {
             long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -174,8 +161,8 @@ namespace SiloModelingTaskClient
                 Id = Guid.NewGuid(),
                 TaskBaseId = task.Id,
                 Sort = sort,
-                LayoutTitle = placement.FamilyName,
-                RfaResourceId = placement.RfaResourceId,
+                LayoutTitle = placement.SymbolName,
+                RfaResourceId = placement.TemplateSiloId,
                 LayoutType = "放置",
                 LocationX = Convert.ToDecimal(placement.LocationXMeters),
                 LocationY = Convert.ToDecimal(placement.LocationYMeters),
@@ -200,8 +187,8 @@ namespace SiloModelingTaskClient
         /// <summary>
         /// 更新建模任务状态
         /// </summary>
-        /// <param name="taskId">建模任务Id</param>
-        /// <param name="modelingDoneStatus">建模完成状态码</param>
+        /// <param name="taskId">建模任务主键</param>
+        /// <param name="modelingDoneStatus">建模完成状态值</param>
         private void UpdateTaskStatus(Guid taskId, int modelingDoneStatus)
         {
             var getResponse = Get<TPResponse<ModelingTask>>("/Task_base/Get/" + taskId);
@@ -222,7 +209,7 @@ namespace SiloModelingTaskClient
         /// </summary>
         /// <typeparam name="T">响应类型</typeparam>
         /// <param name="path">接口路径</param>
-        /// <returns>反序列化后的响应</returns>
+        /// <returns>响应结果</returns>
         private T Get<T>(string path)
         {
             return Send<T>(HttpMethod.Get, path, null);
@@ -235,7 +222,7 @@ namespace SiloModelingTaskClient
         /// <param name="method">HTTP方法</param>
         /// <param name="path">接口路径</param>
         /// <param name="body">请求体</param>
-        /// <returns>反序列化后的响应</returns>
+        /// <returns>响应结果</returns>
         private T Send<T>(HttpMethod method, string path, object body)
         {
             string url = _apiBaseUrl + path;

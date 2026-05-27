@@ -33,7 +33,7 @@ namespace SiloModelingTaskClient
         public string LayoutTitle { get; set; }
 
         /// <summary>
-        /// 族资源Id
+        /// 库型模板Id
         /// </summary>
         [JsonProperty("rfa_resource_id")]
         public Guid? RfaResourceId { get; set; }

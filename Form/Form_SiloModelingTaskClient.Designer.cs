@@ -20,6 +20,8 @@ namespace SiloModelingTaskClient
             this.button_ExecuteModeling = new System.Windows.Forms.Button();
             this.button_SaveRfaResource = new System.Windows.Forms.Button();
             this.textBox_Log = new System.Windows.Forms.TextBox();
+            this.label_SiloName = new System.Windows.Forms.Label();
+            this.textBox_SiloName = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -53,7 +55,7 @@ namespace SiloModelingTaskClient
             // 
             // button_SaveRfaResource
             // 
-            this.button_SaveRfaResource.Location = new System.Drawing.Point(210, 45);
+            this.button_SaveRfaResource.Location = new System.Drawing.Point(454, 45);
             this.button_SaveRfaResource.Name = "button_SaveRfaResource";
             this.button_SaveRfaResource.Size = new System.Drawing.Size(110, 34);
             this.button_SaveRfaResource.TabIndex = 4;
@@ -74,11 +76,30 @@ namespace SiloModelingTaskClient
             this.textBox_Log.Size = new System.Drawing.Size(668, 508);
             this.textBox_Log.TabIndex = 3;
             // 
+            // label_SiloName
+            // 
+            this.label_SiloName.AutoSize = true;
+            this.label_SiloName.Location = new System.Drawing.Point(210, 56);
+            this.label_SiloName.Name = "label_SiloName";
+            this.label_SiloName.Size = new System.Drawing.Size(53, 12);
+            this.label_SiloName.TabIndex = 5;
+            this.label_SiloName.Text = "库型名：";
+            // 
+            // textBox_SiloName
+            // 
+            this.textBox_SiloName.Location = new System.Drawing.Point(269, 51);
+            this.textBox_SiloName.Name = "textBox_SiloName";
+            this.textBox_SiloName.Size = new System.Drawing.Size(179, 21);
+            this.textBox_SiloName.TabIndex = 6;
+            this.textBox_SiloName.TextChanged += new System.EventHandler(this.textBox_SiloName_TextChanged);
+            // 
             // Form_SiloModelingTaskClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(692, 613);
+            this.Controls.Add(this.textBox_SiloName);
+            this.Controls.Add(this.label_SiloName);
             this.Controls.Add(this.textBox_Log);
             this.Controls.Add(this.button_SaveRfaResource);
             this.Controls.Add(this.button_ExecuteModeling);
@@ -96,5 +117,7 @@ namespace SiloModelingTaskClient
         private System.Windows.Forms.Button button_ExecuteModeling;
         private System.Windows.Forms.Button button_SaveRfaResource;
         private System.Windows.Forms.TextBox textBox_Log;
+        private System.Windows.Forms.Label label_SiloName;
+        private System.Windows.Forms.TextBox textBox_SiloName;
     }
 }

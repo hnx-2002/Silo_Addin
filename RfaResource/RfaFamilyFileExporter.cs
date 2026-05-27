@@ -29,7 +29,9 @@ namespace SiloModelingTaskClient
                 throw new InvalidOperationException("无法编辑族：" + item.FamilyName);
             }
 
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".rfa");
+            string tempDir = Path.Combine(Path.GetTempPath(), "SiloModelingTaskClient", "export", Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
+            string tempPath = Path.Combine(tempDir, item.FamilyName + ".rfa");
             bool familyDocClosed = false;
             try
             {
@@ -61,6 +63,11 @@ namespace SiloModelingTaskClient
                 if (File.Exists(tempPath))
                 {
                     File.Delete(tempPath);
+                }
+
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir);
                 }
             }
         }
