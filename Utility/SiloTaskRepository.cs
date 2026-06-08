@@ -51,18 +51,6 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 获取指定建模任务的结果记录
-        /// </summary>
-        /// <param name="taskBaseId">建模任务主键</param>
-        /// <returns>任务结果记录集合</returns>
-        public List<TaskResultRecord> GetTaskResults(Guid taskBaseId)
-        {
-            var response = Get<TPResponse<List<TaskResultRecord>>>("/Task_result/Search_Task_base_id/" + taskBaseId);
-            EnsureResponse(response, "Task_result/Search_Task_base_id");
-            return response.Result;
-        }
-
-        /// <summary>
         /// 获取指定库型字典记录
         /// </summary>
         /// <param name="id">库型字典主键</param>
@@ -80,28 +68,25 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 调用后端计算接口获取模板族放置结果
+        /// 调用后端计算接口获取RFA资源放置结果
         /// </summary>
         /// <param name="taskId">建模任务主键</param>
         /// <returns>建模放置结果集合</returns>
         public List<ModelingPlacementResult> CalculateTemplatePlacements(Guid taskId)
         {
-            var response = Get<TPResponse<List<TemplatePlacementResult>>>("/SiloModelingCalculation/Calculate/" + taskId);
-            EnsureResponse(response, "SiloModelingCalculation/Calculate");
+            var response = Get<TPResponse<ResCommon<SiloCalculationResult>>>("/Task_base/Calculate/" + taskId);
+            EnsureResponse(response, "Task_base/Calculate");
+            EnsureBusinessResponse(response.Result, "Task_base/Calculate");
 
-            return response.Result.Select(x => new ModelingPlacementResult
+            return response.Result.Entity.Placements.Select(x => new ModelingPlacementResult
             {
-                TemplateSiloId = x.TemplateSiloId,
-                SymbolName = x.SymbolName,
+                RfaResourceId = x.RfaResourceId,
+                SymbolName = x.LayoutTitle,
                 RfaPath = x.RfaPath,
-                X = x.LocationX,
-                Y = x.LocationY,
-                Z = x.LocationZ,
-                RotationAngle = x.RotateAngle,
-                LocationXMeters = ModelingUnitConverter.FeetToMeters(x.LocationX),
-                LocationYMeters = ModelingUnitConverter.FeetToMeters(x.LocationY),
-                LocationZMeters = ModelingUnitConverter.FeetToMeters(x.LocationZ),
-                RotationAngleDegrees = x.RotateAngle * 180.0 / Math.PI
+                X = x.Location.X,
+                Y = x.Location.Y,
+                Z = x.Location.Z,
+                RotationAngle = decimal.ToDouble(x.RotateAngle)
             }).ToList();
         }
 
@@ -110,14 +95,14 @@ namespace SiloModelingTaskClient
         /// </summary>
         /// <param name="rfaPath">族文件后端地址</param>
         /// <returns>族文件字节数据</returns>
-        public byte[] DownloadTemplateSiloRfa(string rfaPath)
+        public byte[] DownloadRfaResource(string rfaPath)
         {
             if (string.IsNullOrWhiteSpace(rfaPath))
             {
                 throw new InvalidOperationException("族文件路径为空。");
             }
 
-            string url = _apiBaseUrl + "/Template_silo/Download" + rfaPath;
+            string url = _apiBaseUrl + "/Rfa_resource/Download" + rfaPath;
             HttpResponseMessage response = _httpClient.GetAsync(url).GetAwaiter().GetResult();
             byte[] bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
@@ -130,66 +115,11 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 写入建模结果并更新任务状态
-        /// </summary>
-        /// <param name="task">建模任务</param>
-        /// <param name="placements">建模放置结果集合</param>
-        /// <param name="modelingDoneStatus">建模完成状态值</param>
-        public void InsertModelingResultsAndUpdateStatus(ModelingTask task, List<ModelingPlacementResult> placements, int modelingDoneStatus)
-        {
-            int sort = 1;
-            foreach (ModelingPlacementResult placement in placements)
-            {
-                AddTaskResult(task, placement, sort);
-                sort++;
-            }
-
-            UpdateTaskStatus(task.Id, modelingDoneStatus);
-        }
-
-        /// <summary>
-        /// 写入单条任务结果记录
-        /// </summary>
-        /// <param name="task">建模任务</param>
-        /// <param name="placement">建模放置结果</param>
-        /// <param name="sort">结果排序号</param>
-        private void AddTaskResult(ModelingTask task, ModelingPlacementResult placement, int sort)
-        {
-            long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var record = new TaskResultRecord
-            {
-                Id = Guid.NewGuid(),
-                TaskBaseId = task.Id,
-                Sort = sort,
-                LayoutTitle = placement.SymbolName,
-                RfaResourceId = placement.TemplateSiloId,
-                LayoutType = "放置",
-                LocationX = Convert.ToDecimal(placement.LocationXMeters),
-                LocationY = Convert.ToDecimal(placement.LocationYMeters),
-                LocationZ = Convert.ToDecimal(placement.LocationZMeters),
-                NormalX = 0,
-                NormalY = 0,
-                NormalZ = 1,
-                RotateAngle = Convert.ToDecimal(placement.RotationAngleDegrees),
-                CreateAccount = ClientName,
-                CreateUsername = ClientName,
-                CreateTime = now,
-                UpdateAccount = ClientName,
-                UpdateUsername = ClientName,
-                UpdateTime = now,
-                Remark = "Generated by Revit modeling plugin."
-            };
-
-            var response = Send<TPResponse<Res2Para>>(HttpMethod.Post, "/Task_result/Add", record);
-            EnsureActionResponse(response, "Task_result/Add");
-        }
-
-        /// <summary>
         /// 更新建模任务状态
         /// </summary>
         /// <param name="taskId">建模任务主键</param>
         /// <param name="modelingDoneStatus">建模完成状态值</param>
-        private void UpdateTaskStatus(Guid taskId, int modelingDoneStatus)
+        public void UpdateTaskStatus(Guid taskId, int modelingDoneStatus)
         {
             var getResponse = Get<TPResponse<ModelingTask>>("/Task_base/Get/" + taskId);
             EnsureResponse(getResponse, "Task_base/Get");
@@ -275,6 +205,21 @@ namespace SiloModelingTaskClient
             if (response.Result == null || !response.Result.Status)
             {
                 string message = response.Result == null ? response.Message : response.Result.Message;
+                throw new InvalidOperationException(action + "执行失败：" + message);
+            }
+        }
+
+        /// <summary>
+        /// 校验后端业务响应。
+        /// </summary>
+        /// <typeparam name="T">业务实体类型。</typeparam>
+        /// <param name="response">业务响应。</param>
+        /// <param name="action">接口名称。</param>
+        private static void EnsureBusinessResponse<T>(ResCommon<T> response, string action)
+        {
+            if (response == null || !response.Status)
+            {
+                string message = response == null ? string.Empty : response.Message;
                 throw new InvalidOperationException(action + "执行失败：" + message);
             }
         }

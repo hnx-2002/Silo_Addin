@@ -15,6 +15,7 @@ namespace SiloModelingTaskClient
         private readonly TemplateSiloSaveExternalEventHandler _templateSiloHandler;
         private readonly ExternalEvent _templateSiloEvent;
         private SiloTaskRepository _repository;
+        private TemplateSiloApiClient _rfaResourceApiClient;
         private List<ModelingTask> _pendingTasks = new List<ModelingTask>();
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace SiloModelingTaskClient
         {
             Text = "筒仓建模插件";
             AppendLog("插件已打开。点击“获取新任务”读取新建建模任务，点击“执行建模”执行当前任务列表。");
+            LoadDictSiloOptions();
         }
 
         /// <summary>
@@ -114,18 +116,52 @@ namespace SiloModelingTaskClient
         {
             try
             {
-                string siloName = textBox_SiloName.Text.Trim();
-                var apiClient = new TemplateSiloApiClient(Config.ApiBaseUrl, Config.CoreApiBaseUrl);
-                _templateSiloHandler.SetExecutor(new TemplateSiloSaveExecutor(apiClient, siloName));
+                EnsureRfaResourceRuntime();
+                Guid dictSiloId = (Guid)comboBox_DictSilo.SelectedValue;
+                string dictSiloName = comboBox_DictSilo.Text;
+                _templateSiloHandler.SetExecutor(new TemplateSiloSaveExecutor(_rfaResourceApiClient, dictSiloId, dictSiloName));
                 _templateSiloHandler.SetLog(AppendLog);
                 _templateSiloHandler.Request();
                 _templateSiloEvent.Raise();
-                AppendLog("已请求保存当前三维视图中的库型模板：" + siloName);
+                AppendLog("已请求保存当前三维视图中的族资源，库型：" + dictSiloName);
             }
             catch (Exception ex)
             {
-                AppendLog("保存库型模板启动失败：" + ex.Message);
+                AppendLog("保存族资源启动失败：" + ex.Message);
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 加载库型下拉选项。
+        /// </summary>
+        private void LoadDictSiloOptions()
+        {
+            try
+            {
+                EnsureRfaResourceRuntime();
+                List<SelectOption<Guid>> options = _rfaResourceApiClient.GetDictSiloOptions();
+                comboBox_DictSilo.DisplayMember = "Label";
+                comboBox_DictSilo.ValueMember = "Value";
+                comboBox_DictSilo.DataSource = options;
+                UpdateSaveTemplateButtonState();
+                AppendLog("库型选项已加载，数量：" + options.Count);
+            }
+            catch (Exception ex)
+            {
+                AppendLog("加载库型选项失败：" + ex.Message);
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 确保RFA资源接口客户端已初始化。
+        /// </summary>
+        private void EnsureRfaResourceRuntime()
+        {
+            if (_rfaResourceApiClient == null)
+            {
+                _rfaResourceApiClient = new TemplateSiloApiClient(Config.ApiBaseUrl);
             }
         }
 
@@ -150,27 +186,26 @@ namespace SiloModelingTaskClient
         /// <returns>库型显示文本</returns>
         private string GetTaskSiloTypeText(ModelingTask task)
         {
-            Guid dictSiloId = Guid.Parse(task.SiloType);
-            DictSiloRecord dictSilo = _repository.GetDictSilo(dictSiloId);
+            DictSiloRecord dictSilo = _repository.GetDictSilo(task.DictSiloId);
             return dictSilo.SiloType;
         }
 
         /// <summary>
-        /// 库型名输入框内容变化时刷新保存按钮状态
+        /// 库型下拉框选项变化时刷新保存按钮状态
         /// </summary>
         /// <param name="sender">事件发送者</param>
         /// <param name="e">事件参数</param>
-        private void textBox_SiloName_TextChanged(object sender, EventArgs e)
+        private void comboBox_DictSilo_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateSaveTemplateButtonState();
         }
 
         /// <summary>
-        /// 根据库型名是否为空更新保存族资源按钮启用状态
+        /// 根据库型是否已选择更新保存族资源按钮启用状态
         /// </summary>
         private void UpdateSaveTemplateButtonState()
         {
-            button_SaveRfaResource.Enabled = !string.IsNullOrWhiteSpace(textBox_SiloName.Text);
+            button_SaveRfaResource.Enabled = comboBox_DictSilo.SelectedValue is Guid;
         }
 
         /// <summary>

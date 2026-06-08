@@ -23,14 +23,20 @@ namespace SiloModelingTaskClient
         /// <summary>
         /// 库型字典Id
         /// </summary>
-        [JsonProperty("silo_type")]
-        public string SiloType { get; set; }
+        [JsonProperty("dict_silo_id")]
+        public Guid DictSiloId { get; set; }
 
         /// <summary>
         /// 储库直径
         /// </summary>
         [JsonProperty("silo_diameter")]
         public decimal? SiloDiameter { get; set; }
+
+        /// <summary>
+        /// 库底板高度
+        /// </summary>
+        [JsonProperty("silo_height")]
+        public decimal? SiloHeight { get; set; }
 
         /// <summary>
         /// 项目基点X坐标

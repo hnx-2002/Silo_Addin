@@ -61,9 +61,8 @@
     <Compile Include="Model\ModelingPlacementResult.cs" />
     <Compile Include="Model\ApiModels.cs" />
     <Compile Include="Model\DictSiloRecord.cs" />
-    <Compile Include="Model\TemplatePlacementResult.cs" />
-    <Compile Include="Model\TemplateSiloRecord.cs" />
-    <Compile Include="Model\TaskResultRecord.cs" />
+    <Compile Include="Model\SiloCalculationResult.cs" />
+    <Compile Include="Model\RfaResourceRecord.cs" />
     <Compile Include="Modeling\RevitFamilyPlacementService.cs" />
     <Compile Include="Modeling\SiloModelingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

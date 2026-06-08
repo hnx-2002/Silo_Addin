@@ -21,7 +21,7 @@ namespace SiloModelingTaskClient
             this.button_SaveRfaResource = new System.Windows.Forms.Button();
             this.textBox_Log = new System.Windows.Forms.TextBox();
             this.label_SiloName = new System.Windows.Forms.Label();
-            this.textBox_SiloName = new System.Windows.Forms.TextBox();
+            this.comboBox_DictSilo = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // label1
@@ -83,22 +83,24 @@ namespace SiloModelingTaskClient
             this.label_SiloName.Name = "label_SiloName";
             this.label_SiloName.Size = new System.Drawing.Size(53, 12);
             this.label_SiloName.TabIndex = 5;
-            this.label_SiloName.Text = "库型名：";
+            this.label_SiloName.Text = "库型：";
             // 
-            // textBox_SiloName
+            // comboBox_DictSilo
             // 
-            this.textBox_SiloName.Location = new System.Drawing.Point(269, 51);
-            this.textBox_SiloName.Name = "textBox_SiloName";
-            this.textBox_SiloName.Size = new System.Drawing.Size(179, 21);
-            this.textBox_SiloName.TabIndex = 6;
-            this.textBox_SiloName.TextChanged += new System.EventHandler(this.textBox_SiloName_TextChanged);
+            this.comboBox_DictSilo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_DictSilo.FormattingEnabled = true;
+            this.comboBox_DictSilo.Location = new System.Drawing.Point(269, 51);
+            this.comboBox_DictSilo.Name = "comboBox_DictSilo";
+            this.comboBox_DictSilo.Size = new System.Drawing.Size(179, 20);
+            this.comboBox_DictSilo.TabIndex = 6;
+            this.comboBox_DictSilo.SelectedIndexChanged += new System.EventHandler(this.comboBox_DictSilo_SelectedIndexChanged);
             // 
             // Form_SiloModelingTaskClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(692, 613);
-            this.Controls.Add(this.textBox_SiloName);
+            this.Controls.Add(this.comboBox_DictSilo);
             this.Controls.Add(this.label_SiloName);
             this.Controls.Add(this.textBox_Log);
             this.Controls.Add(this.button_SaveRfaResource);
@@ -118,6 +120,6 @@ namespace SiloModelingTaskClient
         private System.Windows.Forms.Button button_SaveRfaResource;
         private System.Windows.Forms.TextBox textBox_Log;
         private System.Windows.Forms.Label label_SiloName;
-        private System.Windows.Forms.TextBox textBox_SiloName;
+        private System.Windows.Forms.ComboBox comboBox_DictSilo;
     }
 }

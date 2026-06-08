@@ -6,36 +6,39 @@ using System.Linq;
 namespace SiloModelingTaskClient
 {
     /// <summary>
-    /// 库型模板保存执行器
+    /// RFA资源保存执行器。
     /// </summary>
     public class TemplateSiloSaveExecutor
     {
         private const string ClientName = "SiloModelingTaskClient";
 
         private readonly TemplateSiloApiClient _apiClient;
-        private readonly string _siloName;
+        private readonly Guid _dictSiloId;
+        private readonly string _dictSiloName;
         private readonly RfaFamilyCollector _collector;
         private readonly RfaFamilyFileExporter _exporter;
 
         /// <summary>
-        /// 初始化库型模板保存执行器
+        /// 初始化RFA资源保存执行器。
         /// </summary>
-        /// <param name="apiClient">库型模板后端接口客户端</param>
-        /// <param name="siloName">库型名称</param>
-        public TemplateSiloSaveExecutor(TemplateSiloApiClient apiClient, string siloName)
+        /// <param name="apiClient">RFA资源后端接口客户端。</param>
+        /// <param name="dictSiloId">库型Id。</param>
+        /// <param name="dictSiloName">库型名称。</param>
+        public TemplateSiloSaveExecutor(TemplateSiloApiClient apiClient, Guid dictSiloId, string dictSiloName)
         {
             _apiClient = apiClient;
-            _siloName = siloName;
+            _dictSiloId = dictSiloId;
+            _dictSiloName = dictSiloName;
             _collector = new RfaFamilyCollector();
             _exporter = new RfaFamilyFileExporter();
         }
 
         /// <summary>
-        /// 保存当前三维视图中的库型模板族和放置点
+        /// 保存当前三维视图中的RFA资源和模板点。
         /// </summary>
-        /// <param name="doc">Revit文档</param>
-        /// <param name="activeView">当前视图</param>
-        /// <param name="log">日志输出方法</param>
+        /// <param name="doc">Revit文档。</param>
+        /// <param name="activeView">当前视图。</param>
+        /// <param name="log">日志输出方法。</param>
         public void Execute(Document doc, View activeView, Action<string> log)
         {
             SetActive3DViewDetailLevel(doc, activeView);
@@ -44,10 +47,11 @@ namespace SiloModelingTaskClient
             List<FamilyInstance> instances = _collector.CollectAllowedInstancesFromActive3DView(doc, activeView);
             log("当前三维视图目标族实例数量：" + instances.Count);
 
-            _apiClient.DeleteTemplateSiloBySiloName(_siloName);
-            log("已删除同库型旧模板：" + _siloName);
+            _apiClient.DeleteRfaResourcesByDictSiloId(_dictSiloId);
+            log("已删除当前库型旧族资源：" + _dictSiloName);
 
             var rfaPaths = new Dictionary<int, string>();
+            var rfaFiles = new Dictionary<int, RfaFileData>();
             List<RfaFamilyExportItem> families = instances
                 .GroupBy(x => x.Symbol.Family.Id.IntegerValue)
                 .Select(g =>
@@ -68,12 +72,14 @@ namespace SiloModelingTaskClient
                 log("开始上传族：" + family.FamilyName);
                 RfaFileData file = _exporter.Export(doc, family);
                 ResUploadFile upload = _apiClient.UploadRfa(file);
-                rfaPaths[family.Instance.Symbol.Family.Id.IntegerValue] = upload.FilePath;
+                int familyId = family.Instance.Symbol.Family.Id.IntegerValue;
+                rfaPaths[familyId] = upload.FilePath;
+                rfaFiles[familyId] = file;
                 log("族文件已上传：" + family.FamilyName + "，文件地址：" + upload.FilePath);
             }
 
             long now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var records = new List<TemplateSiloRecord>();
+            int recordCount = 0;
             foreach (FamilyInstance instance in instances)
             {
                 if (!(instance.Location is LocationPoint locationPoint))
@@ -81,13 +87,18 @@ namespace SiloModelingTaskClient
                     throw new InvalidOperationException("族实例不是点定位实例，无法读取点坐标。ElementId：" + instance.Id.IntegerValue);
                 }
 
+                int familyId = instance.Symbol.Family.Id.IntegerValue;
                 XYZ point = locationPoint.Point;
-                records.Add(new TemplateSiloRecord
+                RfaFileData file = rfaFiles[familyId];
+                var record = new RfaResourceRecord
                 {
                     Id = Guid.NewGuid(),
-                    SiloName = _siloName,
+                    DictSiloId = _dictSiloId,
                     SymbolName = instance.Symbol.Name,
-                    RfaPath = rfaPaths[instance.Symbol.Family.Id.IntegerValue],
+                    RfaPath = rfaPaths[familyId],
+                    FileName = file.FileName,
+                    FileSize = file.Bytes.Length,
+                    Note = string.Empty,
                     TemplateX = Convert.ToDecimal(point.X),
                     TemplateY = Convert.ToDecimal(point.Y),
                     TemplateZ = Convert.ToDecimal(point.Z),
@@ -98,18 +109,20 @@ namespace SiloModelingTaskClient
                     UpdateUsername = ClientName,
                     UpdateTime = now,
                     Remark = "Saved by Revit modeling plugin."
-                });
+                };
+
+                _apiClient.AddRfaResource(record);
+                recordCount++;
             }
 
-            _apiClient.AddTemplateSiloBatch(records);
-            log("库型模板已保存：" + _siloName + "，记录数量：" + records.Count);
+            log("族资源已保存：" + _dictSiloName + "，记录数量：" + recordCount);
         }
 
         /// <summary>
-        /// 将当前三维视图设置为详细视图
+        /// 将当前三维视图设置为详细视图。
         /// </summary>
-        /// <param name="doc">Revit文档</param>
-        /// <param name="activeView">当前视图</param>
+        /// <param name="doc">Revit文档。</param>
+        /// <param name="activeView">当前视图。</param>
         private void SetActive3DViewDetailLevel(Document doc, View activeView)
         {
             if (!(activeView is View3D))

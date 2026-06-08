@@ -80,13 +80,13 @@ namespace SiloModelingTaskClient
             ModelingPlacementResult placement,
             Dictionary<Guid, string> localPaths)
         {
-            if (localPaths.ContainsKey(placement.TemplateSiloId))
+            if (localPaths.ContainsKey(placement.RfaResourceId))
             {
-                return localPaths[placement.TemplateSiloId];
+                return localPaths[placement.RfaResourceId];
             }
 
-            byte[] bytes = _repository.DownloadTemplateSiloRfa(placement.RfaPath);
-            string dir = Path.Combine(Path.GetTempPath(), "SiloModelingTaskClient", "template_silo", placement.TemplateSiloId.ToString());
+            byte[] bytes = _repository.DownloadRfaResource(placement.RfaPath);
+            string dir = Path.Combine(Path.GetTempPath(), "SiloModelingTaskClient", "rfa_resource", placement.RfaResourceId.ToString());
             Directory.CreateDirectory(dir);
 
             string fileName = Path.GetFileName(placement.RfaPath);
@@ -99,7 +99,7 @@ namespace SiloModelingTaskClient
             File.WriteAllBytes(localPath, bytes);
             string renamedPath = RenameDownloadedFamily(doc, taskId, placement, localPath, dir);
             File.Delete(localPath);
-            localPaths[placement.TemplateSiloId] = renamedPath;
+            localPaths[placement.RfaResourceId] = renamedPath;
             return renamedPath;
         }
 

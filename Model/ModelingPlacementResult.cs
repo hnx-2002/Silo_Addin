@@ -8,9 +8,9 @@ namespace SiloModelingTaskClient
     public class ModelingPlacementResult
     {
         /// <summary>
-        /// 库型模板Id
+        /// RFA资源Id
         /// </summary>
-        public Guid TemplateSiloId { get; set; }
+        public Guid RfaResourceId { get; set; }
 
         /// <summary>
         /// 族类型名
@@ -42,24 +42,5 @@ namespace SiloModelingTaskClient
         /// </summary>
         public double RotationAngle { get; set; }
 
-        /// <summary>
-        /// 米制X坐标
-        /// </summary>
-        public double LocationXMeters { get; set; }
-
-        /// <summary>
-        /// 米制Y坐标
-        /// </summary>
-        public double LocationYMeters { get; set; }
-
-        /// <summary>
-        /// 米制Z坐标
-        /// </summary>
-        public double LocationZMeters { get; set; }
-
-        /// <summary>
-        /// 旋转角度，单位为度
-        /// </summary>
-        public double RotationAngleDegrees { get; set; }
     }
 }

@@ -72,6 +72,50 @@ namespace SiloModelingTaskClient
     }
 
     /// <summary>
+    /// 后端通用业务响应模型。
+    /// </summary>
+    /// <typeparam name="T">实体类型。</typeparam>
+    public class ResCommon<T>
+    {
+        /// <summary>
+        /// 业务执行状态。
+        /// </summary>
+        [JsonProperty("status")]
+        public bool Status { get; set; }
+
+        /// <summary>
+        /// 业务执行消息。
+        /// </summary>
+        [JsonProperty("message")]
+        public string Message { get; set; }
+
+        /// <summary>
+        /// 业务实体。
+        /// </summary>
+        [JsonProperty("entity")]
+        public T Entity { get; set; }
+    }
+
+    /// <summary>
+    /// 下拉选项响应模型。
+    /// </summary>
+    /// <typeparam name="T">选项值类型。</typeparam>
+    public class SelectOption<T>
+    {
+        /// <summary>
+        /// 显示文本。
+        /// </summary>
+        [JsonProperty("label")]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// 选项值。
+        /// </summary>
+        [JsonProperty("value")]
+        public T Value { get; set; }
+    }
+
+    /// <summary>
     /// 文件上传响应模型
     /// </summary>
     public class ResUploadFile

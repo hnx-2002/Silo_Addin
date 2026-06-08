@@ -11,11 +11,6 @@ namespace SiloModelingTaskClient
         public static string ApiBaseUrl { get; set; } = "http://localhost:6140/PTools_PSilo";
 
         /// <summary>
-        /// 核心接口基础地址
-        /// </summary>
-        public static string CoreApiBaseUrl { get; set; } = "http://localhost:6140/T2ACore";
-
-        /// <summary>
         /// 新建任务状态码
         /// </summary>
         public static int NewTaskStatus { get; set; } = 10;

@@ -8,34 +8,42 @@ using System.Text;
 namespace SiloModelingTaskClient
 {
     /// <summary>
-    /// 库型模板后端接口客户端
+    /// RFA资源后端接口客户端。
     /// </summary>
     public class TemplateSiloApiClient
     {
         private readonly string _apiBaseUrl;
-        private readonly string _coreApiBaseUrl;
         private readonly HttpClient _httpClient;
 
         /// <summary>
-        /// 初始化库型模板后端接口客户端
+        /// 初始化RFA资源后端接口客户端。
         /// </summary>
-        /// <param name="apiBaseUrl">业务接口基础地址</param>
-        /// <param name="coreApiBaseUrl">核心接口基础地址</param>
-        public TemplateSiloApiClient(string apiBaseUrl, string coreApiBaseUrl)
+        /// <param name="apiBaseUrl">业务接口基础地址。</param>
+        public TemplateSiloApiClient(string apiBaseUrl)
         {
             _apiBaseUrl = apiBaseUrl.TrimEnd('/');
-            _coreApiBaseUrl = coreApiBaseUrl.TrimEnd('/');
             _httpClient = new HttpClient();
         }
 
         /// <summary>
-        /// 上传族文件
+        /// 获取库型下拉选项。
         /// </summary>
-        /// <param name="rfaFile">族文件数据</param>
-        /// <returns>文件上传结果</returns>
+        /// <returns>库型下拉选项集合。</returns>
+        public List<SelectOption<Guid>> GetDictSiloOptions()
+        {
+            var response = Get<TPResponse<List<SelectOption<Guid>>>>("/Dict_silo/GetOptions");
+            EnsureResponse(response, "Dict_silo/GetOptions");
+            return response.Result;
+        }
+
+        /// <summary>
+        /// 上传RFA文件。
+        /// </summary>
+        /// <param name="rfaFile">RFA文件数据。</param>
+        /// <returns>文件上传结果。</returns>
         public ResUploadFile UploadRfa(RfaFileData rfaFile)
         {
-            string url = _coreApiBaseUrl + "/UploadFile/UploadFile";
+            string url = _apiBaseUrl + "/UploadFile/UploadFile";
             using (var form = new MultipartFormDataContent())
             using (var content = new ByteArrayContent(rfaFile.Bytes))
             {
@@ -62,17 +70,17 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 根据库型名称删除旧库型模板记录
+        /// 根据库型Id删除旧RFA资源记录。
         /// </summary>
-        /// <param name="siloName">库型名称</param>
-        public void DeleteTemplateSiloBySiloName(string siloName)
+        /// <param name="dictSiloId">库型Id。</param>
+        public void DeleteRfaResourcesByDictSiloId(Guid dictSiloId)
         {
-            var searchResponse = Get<TPResponse<List<TemplateSiloRecord>>>(
-                "/Template_silo/Search_Silo_name/" + Uri.EscapeDataString(siloName));
-            EnsureResponse(searchResponse, "Template_silo/Search_Silo_name");
+            var searchResponse = Get<TPResponse<List<RfaResourceRecord>>>(
+                "/Rfa_resource/Search_Dict_silo_id/" + dictSiloId);
+            EnsureResponse(searchResponse, "Rfa_resource/Search_Dict_silo_id");
 
             var ids = new List<Guid>();
-            foreach (TemplateSiloRecord record in searchResponse.Result)
+            foreach (RfaResourceRecord record in searchResponse.Result)
             {
                 ids.Add(record.Id);
             }
@@ -82,39 +90,39 @@ namespace SiloModelingTaskClient
                 return;
             }
 
-            var deleteResponse = Send<TPResponse<Res2Para>>(HttpMethod.Delete, "/Template_silo/Delete", ids.ToArray());
-            EnsureActionResponse(deleteResponse, "Template_silo/Delete");
+            var deleteResponse = Send<TPResponse<Res2Para>>(HttpMethod.Delete, "/Rfa_resource/Delete", ids.ToArray());
+            EnsureActionResponse(deleteResponse, "Rfa_resource/Delete");
         }
 
         /// <summary>
-        /// 批量新增库型模板记录
+        /// 新增RFA资源记录。
         /// </summary>
-        /// <param name="records">库型模板记录集合</param>
-        public void AddTemplateSiloBatch(List<TemplateSiloRecord> records)
+        /// <param name="record">RFA资源记录。</param>
+        public void AddRfaResource(RfaResourceRecord record)
         {
-            var response = Send<TPResponse<Res2Para>>(HttpMethod.Post, "/Template_silo/AddBatch", records);
-            EnsureActionResponse(response, "Template_silo/AddBatch");
+            var response = Send<TPResponse<Res2Para>>(HttpMethod.Post, "/Rfa_resource/Add", record);
+            EnsureActionResponse(response, "Rfa_resource/Add");
         }
 
         /// <summary>
-        /// 发送GET请求
+        /// 发送GET请求。
         /// </summary>
-        /// <typeparam name="T">响应类型</typeparam>
-        /// <param name="path">接口路径</param>
-        /// <returns>响应结果</returns>
+        /// <typeparam name="T">响应类型。</typeparam>
+        /// <param name="path">接口路径。</param>
+        /// <returns>响应结果。</returns>
         private T Get<T>(string path)
         {
             return Send<T>(HttpMethod.Get, path, null);
         }
 
         /// <summary>
-        /// 发送后端接口请求
+        /// 发送后端接口请求。
         /// </summary>
-        /// <typeparam name="T">响应类型</typeparam>
-        /// <param name="method">HTTP方法</param>
-        /// <param name="path">接口路径</param>
-        /// <param name="body">请求体</param>
-        /// <returns>响应结果</returns>
+        /// <typeparam name="T">响应类型。</typeparam>
+        /// <param name="method">HTTP方法。</param>
+        /// <param name="path">接口路径。</param>
+        /// <param name="body">请求体。</param>
+        /// <returns>响应结果。</returns>
         private T Send<T>(HttpMethod method, string path, object body)
         {
             string url = _apiBaseUrl + path;
@@ -138,11 +146,11 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 校验后端统一响应
+        /// 校验后端统一响应。
         /// </summary>
-        /// <typeparam name="T">响应结果类型</typeparam>
-        /// <param name="response">后端统一响应</param>
-        /// <param name="action">接口名称</param>
+        /// <typeparam name="T">响应结果类型。</typeparam>
+        /// <param name="response">后端统一响应。</param>
+        /// <param name="action">接口名称。</param>
         private static void EnsureResponse<T>(TPResponse<T> response, string action)
         {
             if (response == null)
@@ -157,10 +165,10 @@ namespace SiloModelingTaskClient
         }
 
         /// <summary>
-        /// 校验后端操作响应
+        /// 校验后端操作响应。
         /// </summary>
-        /// <param name="response">后端操作响应</param>
-        /// <param name="action">接口名称</param>
+        /// <param name="response">后端操作响应。</param>
+        /// <param name="action">接口名称。</param>
         private static void EnsureActionResponse(TPResponse<Res2Para> response, string action)
         {
             EnsureResponse(response, action);
