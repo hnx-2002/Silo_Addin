@@ -8,7 +8,7 @@ namespace SiloModelingTaskClient
         /// <summary>
         /// 业务接口基础地址
         /// </summary>
-        public static string ApiBaseUrl { get; set; } = "http://localhost:6140/PTools_PSilo";
+        public static string ApiBaseUrl { get; set; } = "http://10.1.19.198:8106/PTools_PSilo";
 
         /// <summary>
         /// 新建任务状态码
