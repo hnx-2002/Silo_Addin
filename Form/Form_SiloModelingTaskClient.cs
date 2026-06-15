@@ -37,7 +37,9 @@ namespace SiloModelingTaskClient
             _templateSiloHandler = templateSiloHandler;
             _templateSiloEvent = templateSiloEvent;
             InitializeComponent();
-            comboBox_DictSilo.Enabled = false;
+            label_SiloName.Visible = false;
+            comboBox_DictSilo.Visible = false;
+            button_SaveRfaResource.Visible = false;
             UpdateSaveTemplateButtonState();
         }
 
@@ -63,7 +65,9 @@ namespace SiloModelingTaskClient
         private void LoadIsAdmin()
         {
             _isAdmin = FunHttp.IsAdmin();
-            comboBox_DictSilo.Enabled = _isAdmin;
+            label_SiloName.Visible = _isAdmin;
+            comboBox_DictSilo.Visible = _isAdmin;
+            button_SaveRfaResource.Visible = _isAdmin;
             UpdateSaveTemplateButtonState();
             AppendLog(_isAdmin ? "当前用户是管理员。" : "当前用户不是管理员。");
         }

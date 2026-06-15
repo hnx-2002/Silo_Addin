@@ -18,12 +18,12 @@ namespace SiloModelingTaskClient
         /// <summary>
         /// 插件平台API地址。
         /// </summary>
-        internal static string APIUrl { get; set; }
+        internal static string APIUrl { get; set; } = "http://10.2.27.10:6140";
 
         /// <summary>
         /// 插件平台Web地址。
         /// </summary>
-        internal static string WebUrl { get; set; }
+        internal static string WebUrl { get; set; } = "http://10.2.27.10:6140";
 
         /// <summary>
         /// 当前插件版本。
