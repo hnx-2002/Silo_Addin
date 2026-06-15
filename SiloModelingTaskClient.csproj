@@ -74,6 +74,8 @@
     <Compile Include="TemplateSilo\TemplateSiloSaveExecutor.cs" />
     <Compile Include="TemplateSilo\TemplateSiloSaveExternalEventHandler.cs" />
     <Compile Include="Utility\AssemblyResolver.cs" />
+    <Compile Include="Utility\FunCommon.cs" />
+    <Compile Include="Utility\FunHttp.cs" />
     <Compile Include="Service\ModelingTaskExecutor.cs" />
     <Compile Include="Service\RevitModelingExternalEventHandler.cs" />
     <Compile Include="Utility\ModelingUnitConverter.cs" />

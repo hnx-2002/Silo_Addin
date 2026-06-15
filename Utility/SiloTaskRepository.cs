@@ -14,17 +14,18 @@ namespace SiloModelingTaskClient
     {
         private const string ClientName = "SiloModelingTaskClient";
 
-        private readonly string _apiBaseUrl;
         private readonly HttpClient _httpClient;
+        private readonly string _token;
 
         /// <summary>
         /// 初始化筒仓建模任务后端仓储
         /// </summary>
         /// <param name="apiBaseUrl">业务接口基础地址</param>
-        public SiloTaskRepository(string apiBaseUrl)
+        public SiloTaskRepository()
         {
-            _apiBaseUrl = apiBaseUrl.TrimEnd('/');
             _httpClient = new HttpClient();
+            _token = FunCommon.ReadToken();
+            _httpClient.DefaultRequestHeaders.Add("tp_token", _token);
         }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace SiloModelingTaskClient
                 throw new InvalidOperationException("族文件路径为空。");
             }
 
-            string url = _apiBaseUrl + "/Rfa_resource/Download" + rfaPath;
+            string url = BuildUrl("/Rfa_resource/Download" + rfaPath);
             HttpResponseMessage response = _httpClient.GetAsync(url).GetAwaiter().GetResult();
             byte[] bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
             if (!response.IsSuccessStatusCode)
@@ -155,7 +156,7 @@ namespace SiloModelingTaskClient
         /// <returns>响应结果</returns>
         private T Send<T>(HttpMethod method, string path, object body)
         {
-            string url = _apiBaseUrl + path;
+            string url = BuildUrl(path);
             using (var request = new HttpRequestMessage(method, url))
             {
                 if (body != null)
@@ -173,6 +174,16 @@ namespace SiloModelingTaskClient
 
                 return JsonConvert.DeserializeObject<T>(content);
             }
+        }
+
+        /// <summary>
+        /// 拼接插件平台代理接口地址。
+        /// </summary>
+        /// <param name="path">接口路径。</param>
+        /// <returns>完整接口地址。</returns>
+        private static string BuildUrl(string path)
+        {
+            return Config.APIUrl.TrimEnd('/') + "/" + Config.ToolCode + path;
         }
 
         /// <summary>

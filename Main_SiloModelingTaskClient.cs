@@ -2,6 +2,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
+using System.Windows.Forms;
 
 namespace SiloModelingTaskClient
 {
@@ -28,6 +29,24 @@ namespace SiloModelingTaskClient
                 Autodesk.Revit.UI.TaskDialog.Show("Notice", "请打开Revit文档");
                 return Result.Cancelled;
             }
+
+
+            var (apiUrl, webUrl) = FunCommon.ReadConfig();
+
+
+#if DEBUG
+#else
+            Config.APIUrl = apiUrl;
+            Config.WebUrl = webUrl;
+
+
+            bool auth = FunHttp.FormAuth();
+            if (!auth)
+            {
+                MessageBox.Show("鉴权失败");
+                return Result.Cancelled;
+            }
+#endif
 
             var modelingHandler = new RevitModelingExternalEventHandler();
             var modelingEvent = ExternalEvent.Create(modelingHandler);

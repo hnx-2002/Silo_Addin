@@ -12,17 +12,17 @@ namespace SiloModelingTaskClient
     /// </summary>
     public class TemplateSiloApiClient
     {
-        private readonly string _apiBaseUrl;
         private readonly HttpClient _httpClient;
+        private readonly string _token;
 
         /// <summary>
         /// 初始化RFA资源后端接口客户端。
         /// </summary>
-        /// <param name="apiBaseUrl">业务接口基础地址。</param>
-        public TemplateSiloApiClient(string apiBaseUrl)
+        public TemplateSiloApiClient()
         {
-            _apiBaseUrl = apiBaseUrl.TrimEnd('/');
             _httpClient = new HttpClient();
+            _token = FunCommon.ReadToken();
+            _httpClient.DefaultRequestHeaders.Add("tp_token", _token);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace SiloModelingTaskClient
         /// <returns>文件上传结果。</returns>
         public ResUploadFile UploadRfa(RfaFileData rfaFile)
         {
-            string url = _apiBaseUrl + "/UploadFile/UploadFile";
+            string url = BuildUrl("/UploadFile/UploadFile");
             using (var form = new MultipartFormDataContent())
             using (var content = new ByteArrayContent(rfaFile.Bytes))
             {
@@ -54,7 +54,7 @@ namespace SiloModelingTaskClient
                 string responseText = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new InvalidOperationException("上传文件失败，状态码：" + response.StatusCode + "，内容：" + responseText);
+                    throw new InvalidOperationException("UploadFile/UploadFile request failed. StatusCode: " + response.StatusCode + ", Content: " + responseText);
                 }
 
                 var apiResponse = JsonConvert.DeserializeObject<TPResponse<ResUploadFile>>(responseText);
@@ -62,7 +62,7 @@ namespace SiloModelingTaskClient
                 if (apiResponse.Result == null || !apiResponse.Result.Status)
                 {
                     string message = apiResponse.Result == null ? apiResponse.Message : apiResponse.Result.Msg;
-                    throw new InvalidOperationException("上传文件接口执行失败：" + message);
+                    throw new InvalidOperationException("UploadFile/UploadFile action failed: " + message);
                 }
 
                 return apiResponse.Result;
@@ -125,7 +125,7 @@ namespace SiloModelingTaskClient
         /// <returns>响应结果。</returns>
         private T Send<T>(HttpMethod method, string path, object body)
         {
-            string url = _apiBaseUrl + path;
+            string url = BuildUrl(path);
             using (var request = new HttpRequestMessage(method, url))
             {
                 if (body != null)
@@ -138,11 +138,21 @@ namespace SiloModelingTaskClient
                 string content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 if (!response.IsSuccessStatusCode)
                 {
-                    throw new InvalidOperationException("接口请求失败：" + method.Method + " " + url + "，状态码：" + response.StatusCode + "，内容：" + content);
+                    throw new InvalidOperationException("API request failed. Method: " + method.Method + ", Url: " + url + ", StatusCode: " + response.StatusCode + ", Content: " + content);
                 }
 
                 return JsonConvert.DeserializeObject<T>(content);
             }
+        }
+
+        /// <summary>
+        /// 拼接插件平台代理接口地址。
+        /// </summary>
+        /// <param name="path">接口路径。</param>
+        /// <returns>完整接口地址。</returns>
+        private static string BuildUrl(string path)
+        {
+            return Config.APIUrl.TrimEnd('/') + "/" + Config.ToolCode + path;
         }
 
         /// <summary>
@@ -155,12 +165,12 @@ namespace SiloModelingTaskClient
         {
             if (response == null)
             {
-                throw new InvalidOperationException(action + "返回空响应。");
+                throw new InvalidOperationException(action + " returned empty response.");
             }
 
             if (response.IsError == true)
             {
-                throw new InvalidOperationException(action + "执行失败：" + response.Message);
+                throw new InvalidOperationException(action + " failed: " + response.Message);
             }
         }
 
@@ -175,7 +185,7 @@ namespace SiloModelingTaskClient
             if (response.Result == null || !response.Result.Status)
             {
                 string message = response.Result == null ? response.Message : response.Result.Message;
-                throw new InvalidOperationException(action + "执行失败：" + message);
+                throw new InvalidOperationException(action + " failed: " + message);
             }
         }
     }

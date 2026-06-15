@@ -3,12 +3,32 @@ namespace SiloModelingTaskClient
     /// <summary>
     /// 插件配置
     /// </summary>
-    public static class Config
+    internal class Config
     {
         /// <summary>
-        /// 业务接口基础地址
+        /// 主插件程序集根命名空间。
         /// </summary>
-        public static string ApiBaseUrl { get; set; } = "http://10.1.19.198:8106/PTools_PSilo";
+        public static string RootName { get; set; } = "IIESPTabs";
+
+        /// <summary>
+        /// 插件编号，用于插件平台鉴权代理。
+        /// </summary>
+        public static string ToolCode { get; set; } = "PTools_PSilo";
+
+        /// <summary>
+        /// 插件平台API地址。
+        /// </summary>
+        internal static string APIUrl { get; set; }
+
+        /// <summary>
+        /// 插件平台Web地址。
+        /// </summary>
+        internal static string WebUrl { get; set; }
+
+        /// <summary>
+        /// 当前插件版本。
+        /// </summary>
+        public static string Rev { get; set; } = FunCommon.GetCurrentVersion();
 
         /// <summary>
         /// 新建任务状态码

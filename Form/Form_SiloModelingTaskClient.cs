@@ -17,6 +17,7 @@ namespace SiloModelingTaskClient
         private SiloTaskRepository _repository;
         private TemplateSiloApiClient _rfaResourceApiClient;
         private List<ModelingTask> _pendingTasks = new List<ModelingTask>();
+        private bool _isAdmin;
 
         /// <summary>
         /// 初始化筒仓建模任务客户端窗体
@@ -36,6 +37,7 @@ namespace SiloModelingTaskClient
             _templateSiloHandler = templateSiloHandler;
             _templateSiloEvent = templateSiloEvent;
             InitializeComponent();
+            comboBox_DictSilo.Enabled = false;
             UpdateSaveTemplateButtonState();
         }
 
@@ -48,7 +50,22 @@ namespace SiloModelingTaskClient
         {
             Text = "筒仓建模插件";
             AppendLog("插件已打开。点击“获取新任务”读取新建建模任务，点击“执行建模”执行当前任务列表。");
-            LoadDictSiloOptions();
+            LoadIsAdmin();
+            if (_isAdmin)
+            {
+                LoadDictSiloOptions();
+            }
+        }
+
+        /// <summary>
+        /// 加载当前用户管理员状态。
+        /// </summary>
+        private void LoadIsAdmin()
+        {
+            _isAdmin = FunHttp.IsAdmin();
+            comboBox_DictSilo.Enabled = _isAdmin;
+            UpdateSaveTemplateButtonState();
+            AppendLog(_isAdmin ? "当前用户是管理员。" : "当前用户不是管理员。");
         }
 
         /// <summary>
@@ -161,7 +178,7 @@ namespace SiloModelingTaskClient
         {
             if (_rfaResourceApiClient == null)
             {
-                _rfaResourceApiClient = new TemplateSiloApiClient(Config.ApiBaseUrl);
+                _rfaResourceApiClient = new TemplateSiloApiClient();
             }
         }
 
@@ -172,7 +189,7 @@ namespace SiloModelingTaskClient
         {
             if (_repository == null)
             {
-                _repository = new SiloTaskRepository(Config.ApiBaseUrl);
+                _repository = new SiloTaskRepository();
             }
 
             _handler.SetExecutor(new ModelingTaskExecutor(_repository, Config.ModelingDoneStatus));
@@ -205,7 +222,7 @@ namespace SiloModelingTaskClient
         /// </summary>
         private void UpdateSaveTemplateButtonState()
         {
-            button_SaveRfaResource.Enabled = comboBox_DictSilo.SelectedValue is Guid;
+            button_SaveRfaResource.Enabled = _isAdmin && comboBox_DictSilo.SelectedValue is Guid;
         }
 
         /// <summary>
